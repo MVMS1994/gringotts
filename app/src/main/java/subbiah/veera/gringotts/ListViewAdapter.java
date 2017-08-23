@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -20,9 +21,10 @@ class ListViewAdapter extends ArrayAdapter<ListModel> {
 
     private final List<ListModel> values;
     private final Activity context;
-    private static class ViewHolder {
+    public static class ViewHolder {
         TextView textView;
         CheckBox checkBox;
+        ImageView imageView;
     }
 
     ListViewAdapter(Activity context, List<ListModel> values) {
@@ -41,6 +43,7 @@ class ListViewAdapter extends ArrayAdapter<ListModel> {
             convertView = inflater.inflate(R.layout.list_view_item, parent, false);
 
             holder = new ViewHolder();
+            holder.imageView = (ImageView) convertView.findViewById(R.id.icon);
             holder.textView = (TextView) convertView.findViewById(R.id.label);
             holder.checkBox = (CheckBox) convertView.findViewById(R.id.check);
             holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -55,7 +58,8 @@ class ListViewAdapter extends ArrayAdapter<ListModel> {
         }
 
         holder = (ViewHolder) convertView.getTag();
-        holder.textView.setText(values.get(position).getName());
+        holder.imageView.setImageDrawable(values.get(position).getIcon());
+        holder.textView.setText(values.get(position).getAppName());
         holder.checkBox.setTag(values.get(position));
         holder.checkBox.setChecked(values.get(position).isSelected());
         return convertView;
