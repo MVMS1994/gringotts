@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable;
  * Created by Veera.Subbiah on 23/08/17.
  */
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 class ListModel {
     private String appName = "";
     private String packageName = "";

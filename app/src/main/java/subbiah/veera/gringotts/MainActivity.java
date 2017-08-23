@@ -1,10 +1,8 @@
 package subbiah.veera.gringotts;
 
 import android.content.pm.PackageInfo;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -13,18 +11,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.LogManager;
 
+@SuppressWarnings("unused")
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private static final String TAG = "MainActivity";
-    ListView listview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listview = (ListView) findViewById(R.id.listview);
+        ListView listview = (ListView) findViewById(R.id.listview);
 
         List<ListModel> list = getPackages();
         final ListViewAdapter adapter = new ListViewAdapter(this, list);
@@ -51,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Collections.sort(res, new Comparator<ListModel>() {
             @Override
             public int compare(ListModel o1, ListModel o2) {
-                return o1.getAppName().compareTo(o2.getAppName());
+                return o1.getAppName().toLowerCase().compareTo(o2.getAppName().toLowerCase());
             }
         });
 
