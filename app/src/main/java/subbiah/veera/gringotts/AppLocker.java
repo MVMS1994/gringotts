@@ -19,6 +19,7 @@ public class AppLocker extends Service {
     private static final String TAG = "AppLocker";
     private Thread worker;
     private volatile boolean shouldContinue;
+    private static List<ListModel> list;
 
     @Override
     public void onCreate() {
@@ -55,7 +56,7 @@ public class AppLocker extends Service {
             @Override
             public void run() {
                 super.run();
-                List<ListModel> list = ((Gringotts) getApplicationContext()).getData();
+                List<ListModel> list = getData();
 
                 while (shouldContinue) {
                     try {
@@ -77,4 +78,13 @@ public class AppLocker extends Service {
         }
         return newList;
     }
+
+    public static void setData(List<ListModel> data) {
+        list = data;
+    }
+
+    public static List<ListModel> getData() {
+        return list;
+    }
+
 }

@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         ListView listview = (ListView) findViewById(R.id.listview);
 
-        ((Gringotts) getApplicationContext()).setData(getPackages());
-        final ListViewAdapter adapter = new ListViewAdapter(this, ((Gringotts)getApplicationContext()).getData());
+        AppLocker.setData(getPackages());
+        final ListViewAdapter adapter = new ListViewAdapter(this, AppLocker.getData());
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(this);
 
