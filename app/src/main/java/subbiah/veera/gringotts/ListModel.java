@@ -10,8 +10,6 @@ import android.graphics.drawable.Drawable;
 class ListModel {
     private String appName = "";
     private String packageName = "";
-    private String versionName = "";
-    private int versionCode = 0;
     private boolean selected = false;
     private Drawable icon;
 
@@ -22,24 +20,6 @@ class ListModel {
 
     public ListModel setIcon(Drawable icon) {
         this.icon = icon;
-        return this;
-    }
-
-    public int getVersionCode() {
-        return versionCode;
-    }
-
-    public ListModel setVersionCode(int versionCode) {
-        this.versionCode = versionCode;
-        return this;
-    }
-
-    public String getVersionName() {
-        return versionName;
-    }
-
-    public ListModel setVersionName(String versionName) {
-        this.versionName = versionName;
         return this;
     }
 

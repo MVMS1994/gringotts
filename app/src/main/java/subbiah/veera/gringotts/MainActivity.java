@@ -1,12 +1,16 @@
 package subbiah.veera.gringotts;
 
-import android.content.pm.PackageInfo;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,24 +27,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         ListView listview = (ListView) findViewById(R.id.listview);
 
-        List<ListModel> list = getPackages();
-        final ListViewAdapter adapter = new ListViewAdapter(this, list);
+        ((Gringotts) getApplicationContext()).setData(getPackages());
+        final ListViewAdapter adapter = new ListViewAdapter(this, ((Gringotts)getApplicationContext()).getData());
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(this);
+
+        Intent i= new Intent(this, AppLocker.class);
+        startService(i);
     }
 
     private List<ListModel> getPackages() {
-        List<PackageInfo> apps = getPackageManager().getInstalledPackages(0);
+        List<ApplicationInfo> apps = getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
 
         ArrayList<ListModel> res = new ArrayList<>();
         for(int i=0; i< apps.size(); i++) {
-            PackageInfo p = apps.get(i);
+            ApplicationInfo p = apps.get(i);
+            if(isSystemPackage(p) && !isWhiteListed(p.packageName)) continue;
             ListModel newInfo = new ListModel()
-                    .setAppName(p.applicationInfo.loadLabel(getPackageManager()).toString())
+                    .setAppName(p.loadLabel(getPackageManager()).toString())
                     .setPackageName(p.packageName)
-                    .setVersionName(p.versionName)
-                    .setVersionCode(p.versionCode)
-                    .setIcon(p.applicationInfo.loadIcon(getPackageManager()));
+                    .setIcon(p.loadIcon(getPackageManager()));
 
             res.add(newInfo);
         }
@@ -60,5 +66,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ListViewAdapter.ViewHolder holder = (ListViewAdapter.ViewHolder) view.getTag();
         ((ListModel) holder.checkBox.getTag()).setSelected(!holder.checkBox.isChecked());
         holder.checkBox.setChecked(!holder.checkBox.isChecked());
+    }
+
+    private boolean isSystemPackage(ApplicationInfo applicationInfo) {
+        return ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
+    }
+
+    private boolean isWhiteListed(String appName) {
+        String whiteListed[] = new String[]{
+                "Drive", "Call", "Camera", "Chrome", "Clock", "Contact", "Download",
+                "File", "mail", "play", "map", "photo", "gallery", "setting"
+        };
+
+        for(String value: whiteListed) {
+            if(appName.toLowerCase().contains(value.toLowerCase())) return true;
+        }
+        return false;
     }
 }
