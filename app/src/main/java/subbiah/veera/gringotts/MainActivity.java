@@ -32,7 +32,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(this);
 
-        Intent i= new Intent(this, AppLocker.class);
+        Intent i = new Intent(this, AppLocker.class);
+        stopService(i);
         startService(i);
     }
 

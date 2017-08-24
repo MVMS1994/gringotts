@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -16,11 +17,22 @@ import java.util.List;
 public class AppLocker extends Service {
 
     private static final String TAG = "AppLocker";
+    private Thread worker;
+    private volatile boolean shouldContinue;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        shouldContinue = true;
+        if(worker == null || !worker.isAlive()) {
+            worker = getNewThread();
+            worker.start();
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        List<ListModel> list = ((Gringotts)getApplicationContext()).getData();
-        Logger.e(TAG, String.valueOf(list.size()));
         return Service.START_STICKY;
     }
 
@@ -28,5 +40,41 @@ public class AppLocker extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+
+    @Override
+    public boolean stopService(Intent name) {
+        shouldContinue = false;
+        worker = null;
+        return super.stopService(name);
+    }
+
+    public Thread getNewThread() {
+        return new Thread("AppLocker Worker") {
+            @Override
+            public void run() {
+                super.run();
+                List<ListModel> list = ((Gringotts) getApplicationContext()).getData();
+
+                while (shouldContinue) {
+                    try {
+                        Thread.sleep(1000);
+                        Logger.e(TAG, String.valueOf(filterSelected(list).size()));
+                    } catch (InterruptedException e) {
+                        Logger.e(TAG, "Interrupted from Sleep", e);
+                    }
+                }
+            }
+        };
+    }
+
+    private List<ListModel> filterSelected(List<ListModel> list) {
+        List<ListModel> newList = new ArrayList<>();
+        for(ListModel listModel: list) {
+            if(listModel.isSelected())
+                newList.add(listModel);
+        }
+        return newList;
     }
 }
