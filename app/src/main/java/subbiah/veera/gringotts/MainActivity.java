@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         oldList.retainAll(newList);
         newList.removeAll(oldList);
 
-        for(ListModel aNewList : newList) {
-            oldList.add(aNewList);
+        for(ListModel item: newList) {
+            oldList.add(item);
         }
 
         Collections.sort(oldList, new Comparator<ListModel>() {
@@ -92,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private boolean isWhiteListed(String appName) {
         String whiteListed[] = new String[]{
-                "Drive", "Call", "Camera", "Chrome", "Clock", "Contact", "Download",
-                "File", "mail", "play", "map", "photo", "gallery", "setting", "gallery"
+            "Drive", "Call", "Camera", "Chrome", "Clock", "Contact", "Download",
+            "File", "mail", "play", "map", "photo", "gallery", "setting", "gallery"
         };
 
         for(String value: whiteListed) {
