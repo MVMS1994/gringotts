@@ -1,13 +1,15 @@
 package subbiah.veera.gringotts;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import java.io.Serializable;
+import org.json.JSONObject;
+
+import java.security.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -26,6 +28,8 @@ public class AppLocker extends Service {
         super.onCreate();
 
         shouldContinue = true;
+        getData(this);
+
         if(worker == null || !worker.isAlive()) {
             worker = getNewThread();
             worker.start();
@@ -51,12 +55,19 @@ public class AppLocker extends Service {
         return super.stopService(name);
     }
 
-    public Thread getNewThread() {
+    @Override
+    public void onDestroy() {
+        shouldContinue = false;
+        worker = null;
+        super.onDestroy();
+    }
+
+    private Thread getNewThread() {
         return new Thread("AppLocker Worker") {
             @Override
             public void run() {
                 super.run();
-                List<ListModel> list = getData();
+                List<ListModel> list = getData(AppLocker.this);
 
                 while (shouldContinue) {
                     try {
@@ -79,12 +90,32 @@ public class AppLocker extends Service {
         return newList;
     }
 
-    public static void setData(List<ListModel> data) {
+    public static void setData(Context context, List<ListModel> data) {
         list = data;
+        saveList(context);
     }
 
-    public static List<ListModel> getData() {
+    public static List<ListModel> getData(Context context) {
+        if(list == null) {
+            list = new ArrayList<>();
+            String rawData[] =  KeyStore.read(context, "data", new JSONObject().toString()).split("_/\\\\_");
+            for(String datum: rawData) {
+                list.add(ListModel.fromString(datum));
+            }
+        }
         return list;
+    }
+
+    public static void saveList(Context context) {
+        if(list.size() >= 1) {
+            StringBuilder data = new StringBuilder();
+            data.append(list.get(0).toString());
+            for (int i = 1; i < list.size(); i++) {
+                data.append("_/\\_");
+                data.append(list.get(i).toString());
+            }
+            KeyStore.write(context, "data", data.toString());
+        }
     }
 
 }

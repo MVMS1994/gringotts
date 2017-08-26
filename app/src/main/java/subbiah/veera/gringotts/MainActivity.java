@@ -4,13 +4,11 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,8 +25,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         ListView listview = (ListView) findViewById(R.id.listview);
 
-        AppLocker.setData(getPackages());
-        final ListViewAdapter adapter = new ListViewAdapter(this, AppLocker.getData());
+        //AppLocker.setData(this, AppLocker.getData(this));
+        final ListViewAdapter adapter = new ListViewAdapter(this, AppLocker.getData(this));
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(this);
 
@@ -65,8 +63,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ListViewAdapter.ViewHolder holder = (ListViewAdapter.ViewHolder) view.getTag();
+
         ((ListModel) holder.checkBox.getTag()).setSelected(!holder.checkBox.isChecked());
         holder.checkBox.setChecked(!holder.checkBox.isChecked());
+
+        AppLocker.saveList(this);
     }
 
     private boolean isSystemPackage(ApplicationInfo applicationInfo) {

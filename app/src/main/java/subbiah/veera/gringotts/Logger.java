@@ -1,5 +1,6 @@
 package subbiah.veera.gringotts;
 
+import android.os.Build;
 import android.util.Log;
 
 /**
@@ -8,12 +9,8 @@ import android.util.Log;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class Logger {
-    private static boolean isAppDebuggable = false;
+    private static boolean isAppDebuggable = BuildConfig.DEBUG;
     private Logger() {}
-
-    public static void setIsAppDebuggable(boolean isAppDebuggable) {
-        Logger.isAppDebuggable = isAppDebuggable;
-    }
 
     public static void d(String tag, String msg) {
         if(isAppDebuggable) Log.d(tag, msg);
