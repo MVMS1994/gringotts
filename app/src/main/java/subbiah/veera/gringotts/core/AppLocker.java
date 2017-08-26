@@ -2,10 +2,11 @@ package subbiah.veera.gringotts.core;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.view.accessibility.AccessibilityEvent;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +33,7 @@ public class AppLocker extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        decideAndOpenLockScreen(filterSelected(list), event.getPackageName().toString());
+        decideAndOpenLockScreen(filterSelected(list), event.getPackageName().toString(), event.getClassName().toString());
     }
 
     @Override
@@ -51,15 +52,25 @@ public class AppLocker extends AccessibilityService {
         setServiceInfo(info);
     }
 
-    private void decideAndOpenLockScreen(List<ListModel> list, String packageName) {
+    private void decideAndOpenLockScreen(List<ListModel> list, String packageName, String className) {
+        KeyguardManager keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+        if(!keyguardManager.isDeviceSecure()) return;
+
         for(ListModel item: list) {
             if(item.getPackageName().equalsIgnoreCase(packageName) && !packageName.equalsIgnoreCase(lastApp)) {
-                Logger.d(TAG, "Open Lock Screen");
+                Logger.d(TAG, "Open Lock Screen: " + packageName);
+
+                openLockScreen();
                 break;
             }
         }
-        if(!isBlackListed(packageName))
+        if(!isBlackListed(className))
             lastApp = packageName;
+    }
+
+    private void openLockScreen() {
+//        Intent intent = new Intent(this, LockScreen.class);
+//        startActivity(intent);
     }
 
     private List<ListModel> filterSelected(List<ListModel> list) {
@@ -109,7 +120,8 @@ public class AppLocker extends AccessibilityService {
 
     private boolean isBlackListed(String packageName) {
         String[] blackListed = {
-            "com.android.systemui"
+                "com.android.systemui.recents.RecentsActivity",
+                "com.android.settings.ConfirmLockPattern"
         };
 
         List<String> apps = Arrays.asList(blackListed);
