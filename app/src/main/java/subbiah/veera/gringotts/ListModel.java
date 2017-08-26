@@ -1,7 +1,5 @@
 package subbiah.veera.gringotts;
 
-import android.graphics.drawable.Drawable;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -69,5 +67,11 @@ class ListModel {
             Logger.e(TAG, "This Happened: ", e);
         }
         return new ListModel();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return getClass() == obj.getClass() &&
+               getClass().cast(obj).getPackageName().equalsIgnoreCase(getPackageName());
     }
 }

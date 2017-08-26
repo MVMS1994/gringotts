@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    @SuppressWarnings("unused")
     private static final String TAG = "MainActivity";
 
     @Override
@@ -25,10 +25,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         ListView listview = (ListView) findViewById(R.id.listview);
 
-        //AppLocker.setData(this, AppLocker.getData(this));
+        AppLocker.setData(this, getPackages());
         final ListViewAdapter adapter = new ListViewAdapter(this, AppLocker.getData(this));
-        listview.setAdapter(adapter);
         listview.setOnItemClickListener(this);
+        listview.setAdapter(adapter);
 
         Intent i = new Intent(this, AppLocker.class);
         stopService(i);
@@ -38,25 +38,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private List<ListModel> getPackages() {
         List<ApplicationInfo> apps = getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
 
-        ArrayList<ListModel> res = new ArrayList<>();
-        for(int i=0; i< apps.size(); i++) {
-            ApplicationInfo p = apps.get(i);
-            if(isSystemPackage(p) && !isWhiteListed(p.packageName)) continue;
+        List<ListModel> oldList = AppLocker.getData(this);
+        List<ListModel> newList = new ArrayList<>();
+        for(ApplicationInfo app: apps) {
+            if(isSystemPackage(app) && !isWhiteListed(app.packageName)) continue;
             ListModel newInfo = new ListModel()
-                    .setAppName(p.loadLabel(getPackageManager()).toString())
-                    .setPackageName(p.packageName);
+                    .setAppName(app.loadLabel(getPackageManager()).toString())
+                    .setPackageName(app.packageName);
 
-            res.add(newInfo);
+            newList.add(newInfo);
+        }
+        oldList.retainAll(newList);
+        newList.removeAll(oldList);
+
+        for(ListModel aNewList : newList) {
+            oldList.add(aNewList);
         }
 
-        Collections.sort(res, new Comparator<ListModel>() {
+        Collections.sort(oldList, new Comparator<ListModel>() {
             @Override
             public int compare(ListModel o1, ListModel o2) {
                 return o1.getAppName().toLowerCase().compareTo(o2.getAppName().toLowerCase());
             }
         });
 
-        return res;
+        return oldList;
     }
 
     @Override
@@ -66,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ((ListModel) holder.checkBox.getTag()).setSelected(!holder.checkBox.isChecked());
         holder.checkBox.setChecked(!holder.checkBox.isChecked());
 
-        AppLocker.saveList(this);
+        AppLocker.saveList(this, AppLocker.getData(this));
     }
 
     private boolean isSystemPackage(ApplicationInfo applicationInfo) {
@@ -76,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private boolean isWhiteListed(String appName) {
         String whiteListed[] = new String[]{
                 "Drive", "Call", "Camera", "Chrome", "Clock", "Contact", "Download",
-                "File", "mail", "play", "map", "photo", "gallery", "setting"
+                "File", "mail", "play", "map", "photo", "gallery", "setting", "gallery"
         };
 
         for(String value: whiteListed) {

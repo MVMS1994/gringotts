@@ -91,30 +91,38 @@ public class AppLocker extends Service {
 
     public static void setData(Context context, List<ListModel> data) {
         list = data;
-        saveList(context);
+        saveList(context, list);
     }
 
     public static List<ListModel> getData(Context context) {
         if(list == null) {
             list = new ArrayList<>();
-            String rawData[] =  KeyStore.read(context, "data", new JSONObject().toString()).split("_/\\\\_");
-            for(String datum: rawData) {
-                list.add(ListModel.fromString(datum));
+            String rawData =  KeyStore.read(context, "data", "");
+            if(!rawData.equals("")) {
+                String[] data = rawData.split("_/\\\\_");
+                for(String datum : data) {
+                    list.add(ListModel.fromString(datum));
+                }
             }
         }
         return list;
     }
 
-    public static void saveList(Context context) {
-        if(list.size() >= 1) {
-            StringBuilder data = new StringBuilder();
-            data.append(list.get(0).toString());
-            for (int i = 1; i < list.size(); i++) {
-                data.append("_/\\_");
-                data.append(list.get(i).toString());
+    public static void saveList(final Context context, final List<ListModel> list) {
+        new Thread("List Saver") {
+            @Override
+            public void run() {
+                if (list.size() >= 1) {
+                    StringBuilder data = new StringBuilder();
+                    data.append(list.get(0).toString());
+                    for (int i = 1; i < list.size(); i++) {
+                        data.append("_/\\_");
+                        data.append(list.get(i).toString());
+                    }
+                    KeyStore.write(context, "data", data.toString());
+                }
             }
-            KeyStore.write(context, "data", data.toString());
-        }
+        }.start();
     }
 
 }
