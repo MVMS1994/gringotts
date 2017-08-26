@@ -14,6 +14,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import subbiah.veera.gringotts.core.AppLocker;
+import subbiah.veera.gringotts.data.ListModel;
+import subbiah.veera.gringotts.ui.ListViewAdapter;
+
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "MainActivity";
@@ -23,16 +27,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView listview = (ListView) findViewById(R.id.listview);
-
-        AppLocker.setData(this, getPackages());
-        final ListViewAdapter adapter = new ListViewAdapter(this, AppLocker.getData(this));
-        listview.setOnItemClickListener(this);
-        listview.setAdapter(adapter);
-
         Intent i = new Intent(this, AppLocker.class);
         stopService(i);
         startService(i);
+    }
+
+    @Override
+    protected void onPause() {
+        AppLocker.saveList(this, AppLocker.getData(this));
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        AppLocker.setData(this, getPackages());
+        renderListView();
+
+        super.onResume();
     }
 
     private List<ListModel> getPackages() {
@@ -89,5 +100,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if(appName.toLowerCase().contains(value.toLowerCase())) return true;
         }
         return false;
+    }
+
+    private void renderListView() {
+        ListView listview = (ListView) findViewById(R.id.listview);
+
+        final ListViewAdapter adapter = new ListViewAdapter(this, AppLocker.getData(this));
+        listview.setOnItemClickListener(this);
+        listview.setAdapter(adapter);
     }
 }

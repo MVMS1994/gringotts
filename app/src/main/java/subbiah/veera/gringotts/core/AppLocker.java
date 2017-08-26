@@ -1,4 +1,4 @@
-package subbiah.veera.gringotts;
+package subbiah.veera.gringotts.core;
 
 import android.app.Service;
 import android.content.Context;
@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import subbiah.veera.gringotts.data.KeyStore;
+import subbiah.veera.gringotts.data.ListModel;
+import subbiah.veera.gringotts.data.Logger;
 
 /**
  * Created by Veera.Subbiah on 24/08/17.

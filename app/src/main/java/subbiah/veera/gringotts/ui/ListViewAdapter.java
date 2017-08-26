@@ -1,4 +1,4 @@
-package subbiah.veera.gringotts;
+package subbiah.veera.gringotts.ui;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
@@ -15,22 +15,27 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import subbiah.veera.gringotts.R;
+import subbiah.veera.gringotts.data.ListModel;
+import subbiah.veera.gringotts.data.Logger;
+
 /**
  * Created by Veera.Subbiah on 23/08/17.
  */
 
-class ListViewAdapter extends ArrayAdapter<ListModel> {
+public class ListViewAdapter extends ArrayAdapter<ListModel> {
 
     private static final String TAG = "ListViewAdapter";
     private final List<ListModel> values;
     private final Activity context;
+
     public static class ViewHolder {
-        TextView textView;
-        CheckBox checkBox;
+        public CheckBox checkBox;
         ImageView imageView;
+        TextView textView;
     }
 
-    ListViewAdapter(Activity context, List<ListModel> values) {
+    public ListViewAdapter(Activity context, List<ListModel> values) {
         super(context, R.layout.list_view_item, values);
         this.values = values;
         this.context = context;
@@ -49,6 +54,7 @@ class ListViewAdapter extends ArrayAdapter<ListModel> {
             holder.imageView = (ImageView) convertView.findViewById(R.id.icon);
             holder.textView = (TextView) convertView.findViewById(R.id.label);
             holder.checkBox = (CheckBox) convertView.findViewById(R.id.check);
+
             holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

@@ -1,6 +1,8 @@
-package subbiah.veera.gringotts;
+package subbiah.veera.gringotts.data;
 
 import android.util.Log;
+
+import subbiah.veera.gringotts.BuildConfig;
 
 /**
  * Created by Veera.Subbiah on 24/08/17.

@@ -1,4 +1,4 @@
-package subbiah.veera.gringotts;
+package subbiah.veera.gringotts.data;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,7 +8,7 @@ import org.json.JSONObject;
  */
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-class ListModel {
+public class ListModel {
     private static final String TAG = "ListModel";
     private String appName = "";
     private String packageName = "";
