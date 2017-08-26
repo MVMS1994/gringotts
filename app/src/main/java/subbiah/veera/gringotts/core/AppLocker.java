@@ -1,10 +1,9 @@
 package subbiah.veera.gringotts.core;
 
-import android.app.Service;
+import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
-import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
+import android.view.accessibility.AccessibilityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,69 +16,45 @@ import subbiah.veera.gringotts.data.Logger;
  * Created by Veera.Subbiah on 24/08/17.
  */
 
-public class AppLocker extends Service {
+public class AppLocker extends AccessibilityService {
 
     private static final String TAG = "AppLocker";
-    private volatile boolean shouldContinue;
     private static List<ListModel> list;
-    private Thread worker;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        shouldContinue = true;
         getData(this);
-
-        if(worker == null || !worker.isAlive()) {
-            worker = getNewThread();
-            worker.start();
-        }
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return Service.START_STICKY;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-
-    @Override
-    public boolean stopService(Intent name) {
-        shouldContinue = false;
-        worker = null;
-        return super.stopService(name);
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+        decideAndOpenLockScreen(filterSelected(list), event.getPackageName().toString());
     }
 
     @Override
-    public void onDestroy() {
-        shouldContinue = false;
-        worker = null;
-        super.onDestroy();
+    public void onInterrupt() {
+
     }
 
-    private Thread getNewThread() {
-        return new Thread("AppLocker Worker") {
-            @Override
-            public void run() {
-                super.run();
-                List<ListModel> list = getData(AppLocker.this);
+    @Override
+    protected void onServiceConnected() {
+        Logger.d(TAG, "onServiceConnected");
 
-                while (shouldContinue) {
-                    try {
-                        Thread.sleep(1000);
-                        Logger.e(TAG, String.valueOf(filterSelected(list).size()));
-                    } catch (InterruptedException e) {
-                        Logger.e(TAG, "Interrupted from Sleep", e);
-                    }
-                }
+        AccessibilityServiceInfo info = new AccessibilityServiceInfo();
+        info.flags = AccessibilityServiceInfo.DEFAULT;
+        info.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
+        info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+        setServiceInfo(info);
+    }
+
+    private void decideAndOpenLockScreen(List<ListModel> list, String packageName) {
+        for(ListModel item: list) {
+            if(item.getPackageName().equalsIgnoreCase(packageName)) {
+                Logger.d(TAG, "Open Lock Screen");
+                break;
             }
-        };
+        }
     }
 
     private List<ListModel> filterSelected(List<ListModel> list) {
@@ -126,5 +101,4 @@ public class AppLocker extends Service {
             }
         }.start();
     }
-
 }
