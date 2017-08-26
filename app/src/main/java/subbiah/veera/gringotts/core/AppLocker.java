@@ -5,7 +5,9 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
 import android.view.accessibility.AccessibilityEvent;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import subbiah.veera.gringotts.data.KeyStore;
@@ -19,6 +21,7 @@ import subbiah.veera.gringotts.data.Logger;
 public class AppLocker extends AccessibilityService {
 
     private static final String TAG = "AppLocker";
+    private String lastApp = "";
     private static List<ListModel> list;
 
     @Override
@@ -50,11 +53,13 @@ public class AppLocker extends AccessibilityService {
 
     private void decideAndOpenLockScreen(List<ListModel> list, String packageName) {
         for(ListModel item: list) {
-            if(item.getPackageName().equalsIgnoreCase(packageName)) {
+            if(item.getPackageName().equalsIgnoreCase(packageName) && !packageName.equalsIgnoreCase(lastApp)) {
                 Logger.d(TAG, "Open Lock Screen");
                 break;
             }
         }
+        if(!isBlackListed(packageName))
+            lastApp = packageName;
     }
 
     private List<ListModel> filterSelected(List<ListModel> list) {
@@ -100,5 +105,14 @@ public class AppLocker extends AccessibilityService {
                 }
             }
         }.start();
+    }
+
+    private boolean isBlackListed(String packageName) {
+        String[] blackListed = {
+            "com.android.systemui"
+        };
+
+        List<String> apps = Arrays.asList(blackListed);
+        return apps.contains(packageName);
     }
 }
