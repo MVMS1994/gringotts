@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONObject;
 
-import java.security.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +18,9 @@ import java.util.List;
 public class AppLocker extends Service {
 
     private static final String TAG = "AppLocker";
-    private Thread worker;
     private volatile boolean shouldContinue;
     private static List<ListModel> list;
+    private Thread worker;
 
     @Override
     public void onCreate() {

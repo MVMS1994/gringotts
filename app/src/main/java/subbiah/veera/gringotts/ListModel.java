@@ -15,17 +15,7 @@ class ListModel {
     private String appName = "";
     private String packageName = "";
     private boolean selected = false;
-    private Drawable icon;
 
-
-    public Drawable getIcon() {
-        return icon;
-    }
-
-    public ListModel setIcon(Drawable icon) {
-        this.icon = icon;
-        return this;
-    }
 
     public String getPackageName() {
         return packageName;

@@ -1,6 +1,8 @@
 package subbiah.veera.gringotts;
 
 import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import java.util.List;
 
 class ListViewAdapter extends ArrayAdapter<ListModel> {
 
+    private static final String TAG = "ListViewAdapter";
     private final List<ListModel> values;
     private final Activity context;
     public static class ViewHolder {
@@ -57,8 +60,15 @@ class ListViewAdapter extends ArrayAdapter<ListModel> {
             convertView.setTag(holder);
         }
 
+        Drawable icon = null;
+        try {
+            icon = context.getPackageManager().getApplicationIcon(values.get(position).getPackageName());
+        } catch (PackageManager.NameNotFoundException e) {
+            Logger.e(TAG, "This Happened: ", e);
+        }
+
         holder = (ViewHolder) convertView.getTag();
-        holder.imageView.setImageDrawable(values.get(position).getIcon());
+        holder.imageView.setImageDrawable(icon);
         holder.textView.setText(values.get(position).getAppName());
         holder.checkBox.setTag(values.get(position));
         holder.checkBox.setChecked(values.get(position).isSelected());

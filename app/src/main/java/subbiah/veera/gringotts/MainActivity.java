@@ -44,8 +44,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if(isSystemPackage(p) && !isWhiteListed(p.packageName)) continue;
             ListModel newInfo = new ListModel()
                     .setAppName(p.loadLabel(getPackageManager()).toString())
-                    .setPackageName(p.packageName)
-                    .setIcon(p.loadIcon(getPackageManager()));
+                    .setPackageName(p.packageName);
 
             res.add(newInfo);
         }

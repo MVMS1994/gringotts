@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 
 class KeyStore {
 
+    @SuppressWarnings("SameParameterValue")
     @SuppressLint("ApplySharedPref")
     static void write(Context context, String key, String value) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE);
@@ -18,6 +19,7 @@ class KeyStore {
         editor.commit();
     }
 
+    @SuppressWarnings("SameParameterValue")
     static String read(Context context, String key, String defaultValue) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE);
         return sharedPreferences.getString(key, defaultValue);
