@@ -1,2 +1,2 @@
 # gringotts
-App Locker using FingerPrint for FingerPrint devices
+Light weighted App Locker using LockScreen for Android Devices
