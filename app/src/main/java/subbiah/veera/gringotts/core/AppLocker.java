@@ -24,6 +24,7 @@ public class AppLocker extends AccessibilityService {
     private static final String TAG = "AppLocker";
     private String lastApp = "";
     private static List<ListModel> list;
+    private static boolean locked = false;
 
     @Override
     public void onCreate() {
@@ -33,7 +34,9 @@ public class AppLocker extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        decideAndOpenLockScreen(filterSelected(list), event.getPackageName().toString(), event.getClassName().toString());
+        decideAndOpenLockScreen(filterSelected(list),
+                event.getPackageName().toString(),
+                event.getClassName().toString());
     }
 
     @Override
@@ -57,20 +60,22 @@ public class AppLocker extends AccessibilityService {
         if(!keyguardManager.isDeviceSecure()) return;
 
         for(ListModel item: list) {
-            if(item.getPackageName().equalsIgnoreCase(packageName) && !packageName.equalsIgnoreCase(lastApp)) {
+            if(item.getPackageName().equalsIgnoreCase(packageName) && !packageName.equalsIgnoreCase(lastApp) && !isLocked()) {
                 Logger.d(TAG, "Open Lock Screen: " + packageName);
+                lastApp = packageName;
+                setLocked(true);
 
                 openLockScreen();
                 break;
             }
         }
-        if(!isBlackListed(className))
+        if(!isBlackListed(className) && !isLocked())
             lastApp = packageName;
     }
 
     private void openLockScreen() {
-//        Intent intent = new Intent(this, LockScreen.class);
-//        startActivity(intent);
+        Intent intent = new Intent(this, LockScreen.class);
+        startActivity(intent);
     }
 
     private List<ListModel> filterSelected(List<ListModel> list) {
@@ -121,10 +126,19 @@ public class AppLocker extends AccessibilityService {
     private boolean isBlackListed(String packageName) {
         String[] blackListed = {
                 "com.android.systemui.recents.RecentsActivity",
-                "com.android.settings.ConfirmLockPattern"
+                "com.android.settings.ConfirmLockPattern",
+                "subbiah.veera.gringotts.core.LockScreen"
         };
 
         List<String> apps = Arrays.asList(blackListed);
         return apps.contains(packageName);
+    }
+
+    public static boolean isLocked() {
+        return locked;
+    }
+
+    public static void setLocked(boolean locked) {
+        AppLocker.locked = locked;
     }
 }

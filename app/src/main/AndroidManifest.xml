@@ -26,6 +26,8 @@
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
         </service>
+
+        <activity android:name=".core.LockScreen" />
     </application>
 
 </manifest>
