@@ -69,8 +69,9 @@ public class AppLocker extends AccessibilityService {
                 break;
             }
         }
-        if(!isBlackListed(className) && !isLocked())
+        if(!isBlackListed(className) && !isBlackListed(packageName) && !isLocked())
             lastApp = packageName;
+        Logger.d(TAG, "ClassName: " + className + "\nPackageName: " + packageName + "\nCurrentApp: " + lastApp + "\nIs Locked: " + isLocked());
     }
 
     private void openLockScreen() {
@@ -125,9 +126,10 @@ public class AppLocker extends AccessibilityService {
 
     private boolean isBlackListed(String packageName) {
         String[] blackListed = {
-                "com.android.systemui.recents.RecentsActivity",
+                "com.android.systemui",
                 "com.android.settings.ConfirmLockPattern",
-                "subbiah.veera.gringotts.core.LockScreen"
+                "subbiah.veera.gringotts.core.LockScreen",
+                "android.inputmethodservice.SoftInputWindow"
         };
 
         List<String> apps = Arrays.asList(blackListed);
